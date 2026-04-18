@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 🎁🎁🎁 ✨</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #ff4d79;
+            --soft-pink: #ffb3c1;
+            --disney-magic: #d4af37; /* Màu vàng hoàng gia / phép thuật */
+            --deep-garden: #1a0008; /* Đỏ rượu vang sâu thẳm làm nền cho hoa hồng */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--deep-garden);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Nền phép thuật - Đổi sang dải gradient đỏ hoa hồng/rượu vang */
+        .rose-field-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(150, 0, 40, 0.3) 0%, transparent 60%),
+                radial-gradient(circle at 85% 75%, rgba(200, 20, 60, 0.2) 0%, transparent 60%),
+                radial-gradient(circle at 50% 50%, rgba(20, 0, 5, 1) 0%, transparent 100%);
+            z-index: 0;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .ui-layer {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        .start-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 60px rgba(212, 175, 55, 0.8)); /* Glow vàng phép thuật */
+        }
+
+        .bouquet-icon {
+            width: 280px;
+            height: 280px;
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+            animation: float 4s infinite ease-in-out;
+            will-change: transform;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .btn-text {
+            color: white;
+            margin-top: -10px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, var(--disney-magic), #fff);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        @keyframes shine {
+            to { background-position: 200%; }
+        }
+
+        #scene-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        #runner-bear {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 200px;
+            height: 200px;
+            transform: translate3d(-300px, -50%, 0);
+            z-index: 2;
+            will-change: transform;
+            /* Gấu phát sáng aura phép thuật nhẹ */
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4)); 
+        }
+
+        .bear-svg {
+            width: 100%;
+            height: 100%;
+            transform-origin: center bottom;
+            /* Hiệu ứng xoay mượt khi gấu lật người */
+            transition: transform 0.25s ease-in-out; 
+        }
+
+        /* CÁC CLASS CHO ĐIỆU NHẢY MOONWALK */
+        .moonwalking .bear-svg {
+            /* Lật trục X (quay mặt về trái) và hơi ngả người ra sau một xíu */
+            transform: scaleX(-1) rotate(-3deg); 
+        }
+
+        .moonwalking #leg-l {
+            /* Trượt chân điệu nghệ */
+            animation: moonwalkLeg 1.2s infinite linear;
+        }
+
+        .moonwalking #leg-r {
+            /* Chân còn lại trượt lệch nhịp để tạo cảm giác đi bộ */
+            animation: moonwalkLeg 1.2s infinite linear 0.6s;
+        }
+
+        @keyframes moonwalkLeg {
+            0%, 100% { transform: translateX(12px); }
+            50% { transform: translateX(-12px); }
+        }
+
+        #card-wrapper {
+            background: linear-gradient(135deg, #fffdf0 0%, #fcf5d8 100%); /* Màu giấy da cổ tích */
+            padding: 40px 50px;
+            border-radius: 8px; /* Bo góc ít hơn cho giống quyển sách */
+            max-width: 90%;
+            width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0) scale(0.1) rotate(-10deg); 
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+            /* Viền vàng hoàng gia */
+            border: 2px solid var(--disney-magic);
+            pointer-events: auto; 
+            overflow: hidden; 
+            will-change: transform, opacity;
+        }
+
+        .card-thrown {
+            transform: translate3d(-50%, -50%, 0) scale(1) rotate(0deg) !important;
+            opacity: 1 !important;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 40px rgba(212, 175, 55, 0.3), inset 0 0 30px rgba(255,255,255,0.8) !important;
+        }
+
+        /* Nếp gấp giả lập mép thiệp viền đôi hoàng gia */
+        #card-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid var(--disney-magic);
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.7;
+        }
+
+        /* ----- TRANG TRÍ DÂY LEO HOA HỒNG (Beauty and the Beast vibes) ----- */
+        .decor-corner {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            pointer-events: none;
+            z-index: 2; 
+        }
+
+        .decor-top-left {
+            top: 0;
+            left: 0;
+        }
+
+        .decor-bottom-right {
+            bottom: 0;
+            right: 0;
+            transform: rotate(180deg);
+        }
+
+        .typed-text-container {
+            font-family: 'Great Vibes', cursive; /* Font chữ uốn lượn phong cách hoàng gia/phép thuật */
+            font-size: 2.8rem; /* Chữ to hơn vì font này nét mảnh */
+            color: #4a0e2e;
+            line-height: 1.4;
+            min-height: 180px;
+            position: relative;
+            z-index: 10; 
+            text-shadow: 0 0 1px rgba(212, 175, 55, 0.6); /* Bóng chữ vàng nhạt */
+            padding: 10px 20px;
+        }
+
+        #typedText {
+            white-space: pre-wrap;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 2.6rem;
+            background-color: var(--disney-magic);
+            animation: blink 0.7s infinite;
+            vertical-align: text-bottom;
+            margin-left: 4px;
+            box-shadow: 0 0 5px var(--disney-magic);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="rose-field-bg"></div>
+    <canvas id="canvas"></canvas>
+
+    <div class="ui-layer" id="ui">
+        <button class="start-btn" id="startBtn">
+            <!-- Hoa hồng được thay thế gradient rực rỡ mầu nhiệm hơn -->
+            <svg class="bouquet-icon" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="wrapGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" /> <!-- Bọc màu vàng kim -->
+                        <stop offset="100%" style="stop-color:#ffaa00;stop-opacity:1" />
+                    </linearGradient>
+                    <!-- Hào quang phép thuật -->
+                    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+                        <stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="100" cy="80" r="70" fill="url(#glow)"/>
+                
+                <path d="M100 180 L30 70 Q20 40 60 40 L140 40 Q180 40 170 70 Z" fill="url(#wrapGrad)" />
+                <path d="M100 180 L50 90 L150 90 Z" fill="#d4af37" opacity="0.6" />
+                <path d="M100 175 L85 190 Q100 185 115 190 Z" fill="#ffffff" />
+                <circle cx="100" cy="175" r="7" fill="#ffffff" />
+                <path d="M70 60 Q50 40 80 50 Z" fill="#1e4d2b" />
+                <path d="M130 60 Q150 40 120 50 Z" fill="#1e4d2b" />
+                <g class="roses">
+                    <circle cx="75" cy="85" r="22" fill="#ff1a1a" />
+                    <circle cx="125" cy="85" r="22" fill="#ff0040" />
+                    <circle cx="100" cy="95" r="25" fill="#ffd700" /> <!-- Điểm xuyết hoa hồng vàng -->
+                    <circle cx="100" cy="65" r="20" fill="#ff3366" />
+                    <circle cx="80" cy="65" r="18" fill="#ffffff" />
+                    <circle cx="120" cy="65" r="18" fill="#ff1a1a" />
+                </g>
+                <!-- Ngôi sao lấp lánh trên bó hoa -->
+                <path d="M 50 30 Q 55 40 65 45 Q 55 50 50 60 Q 45 50 35 45 Q 45 40 50 30 Z" fill="#fff"/>
+                <path d="M 150 35 Q 153 42 160 45 Q 153 48 150 55 Q 147 48 140 45 Q 147 42 150 35 Z" fill="#ffd700"/>
+            </svg>
+            <span class="btn-text">Push here</span>
+        </button>
+    </div>
+
+    <div id="scene-container" class="hidden">
+        <div id="runner-bear">
+            <svg class="bear-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <clipPath id="body-clip">
+                        <circle cx="100" cy="130" r="50"/>
+                    </clipPath>
+                </defs>
+
+                <!-- Body base -->
+                <circle cx="100" cy="130" r="50" fill="#dca780"/>
+                
+                <!-- TUXEDO (Áo vest đen & sơ mi trắng được cắt gọn theo form body) -->
+                <g clip-path="url(#body-clip)">
+                    <!-- Sơ mi trắng -->
+                    <rect x="50" y="80" width="100" height="100" fill="#ffffff"/>
+                    <!-- Áo vest đen cắt xẻ chữ V -->
+                    <path d="M 50 80 L 75 80 L 100 165 L 125 80 L 150 80 L 150 180 L 50 180 Z" fill="#1a1a1a"/>
+                    <!-- Nút áo sơ mi -->
+                    <circle cx="100" cy="135" r="3" fill="#1a1a1a"/>
+                    <circle cx="100" cy="150" r="3" fill="#1a1a1a"/>
+                </g>
+
+                <!-- Head -->
+                <circle cx="100" cy="80" r="45" fill="#dca780"/>
+                
+                <!-- Ears -->
+                <circle cx="65" cy="55" r="15" fill="#dca780"/>
+                <circle cx="65" cy="55" r="8" fill="#f4dbce"/>
+                <circle cx="135" cy="55" r="15" fill="#dca780"/>
+                <circle cx="135" cy="55" r="8" fill="#f4dbce"/>
+                
+                <!-- Face -->
+                <ellipse cx="100" cy="95" rx="22" ry="16" fill="#f4dbce"/>
+                <ellipse cx="100" cy="88" rx="8" ry="5" fill="#6d4c41"/> <!-- Mũi -->
+                <path d="M 100 93 Q 106 102 112 95" stroke="#6d4c41" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M 100 93 Q 94 102 88 95" stroke="#6d4c41" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+                
+                <!-- Eyes -->
+                <circle cx="82" cy="75" r="5" fill="#222"/>
+                <circle cx="118" cy="75" r="5" fill="#222"/>
+                <circle cx="80" cy="73" r="1.5" fill="#fff"/>
+                <circle cx="116" cy="73" r="1.5" fill="#fff"/>
+                
+                <!-- Blushes -->
+                <circle cx="70" cy="88" r="7" fill="#ff6699" opacity="0.6"/>
+                <circle cx="130" cy="88" r="7" fill="#ff6699" opacity="0.6"/>
+                
+                <!-- THEO PHONG CÁCH DISNEY: Thêm nơ đỏ cài ở cổ áo sơ mi -->
+                <g transform="translate(100, 115)">
+                    <path d="M -5 0 L -18 -10 L -18 10 Z" fill="#cc0000"/>
+                    <path d="M 5 0 L 18 -10 L 18 10 Z" fill="#cc0000"/>
+                    <circle cx="0" cy="0" r="6" fill="#ff0000"/>
+                    <path d="M -5 -2 L -12 -5" stroke="#990000" stroke-width="1.5"/>
+                    <path d="M 5 -2 L 12 -5" stroke="#990000" stroke-width="1.5"/>
+                </g>
+
+                <!-- Chân mặc quần âu đen & bàn chân gấu -->
+                <g id="leg-l">
+                    <rect x="75" y="160" width="18" height="25" fill="#1a1a1a"/>
+                    <rect x="75" y="175" width="18" height="15" rx="7" fill="#dca780"/>
+                </g>
+                <g id="leg-r">
+                    <rect x="107" y="160" width="18" height="25" fill="#1a1a1a"/>
+                    <rect x="107" y="175" width="18" height="15" rx="7" fill="#dca780"/>
+                </g>
+
+                <!-- Tư thế 1: Đang ôm phong thư nhỏ -->
+                <g id="bear-holding">
+                    <!-- Tay áo vest đen -->
+                    <path d="M 55 115 Q 40 150 85 150" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round" fill="none"/>
+                    <!-- Bàn tay gấu -->
+                    <circle cx="85" cy="150" r="9" fill="#dca780"/>
+                    
+                    <g id="mini-envelope" transform="translate(100, 138) rotate(-10)">
+                        <rect x="-35" y="-20" width="70" height="40" fill="#fffdf7" stroke="#d4af37" rx="3" stroke-width="2"/>
+                        <path d="M -35 -20 L 0 5 L 35 -20" stroke="#d4af37" fill="none" stroke-width="2"/>
+                        <circle cx="0" cy="5" r="7" fill="#b30000"/>
+                        <circle cx="0" cy="5" r="5" fill="#e60000"/>
+                    </g>
+
+                    <path d="M 145 115 Q 160 150 115 150" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round" fill="none"/>
+                    <circle cx="115" cy="150" r="9" fill="#dca780"/>
+                </g>
+                
+                <!-- Tư thế 2: Vung tay lên ném thiệp -->
+                <g id="bear-thrown" style="display:none;">
+                     <!-- Tay áo vest đen giơ cao -->
+                     <path d="M 55 115 Q 30 80 50 60" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round" fill="none"/>
+                     <!-- Bàn tay gấu -->
+                     <circle cx="50" cy="60" r="9" fill="#dca780"/>
+
+                     <path d="M 145 115 Q 170 80 150 60" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round" fill="none"/>
+                     <circle cx="150" cy="60" r="9" fill="#dca780"/>
+
+                     <!-- Magic sparkles rớt ra từ tay gấu khi vung -->
+                     <circle cx="45" cy="45" r="3" fill="#fff"/>
+                     <circle cx="155" cy="45" r="3" fill="#ffd700"/>
+                     <circle cx="35" cy="65" r="2" fill="#ffd700"/>
+                </g>
+            </svg>
+        </div>
+        
+        <div id="card-wrapper">
+            <!-- Dây gai và Hoa hồng góc trên bên trái -->
+            <div class="decor-corner decor-top-left">
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <!-- Dây leo chính -->
+                        <path d="M -10 90 Q 30 70 80 30 Q 110 0 130 -20" stroke="#2d5a27" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <!-- Nhánh leo -->
+                        <path d="M 20 40 Q 60 45 100 10" stroke="#2d5a27" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <path d="M 50 80 Q 70 60 90 90" stroke="#2d5a27" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+                        <!-- Các gai nhọn (Thorns) -->
+                        <polygon points="10,75 16,65 22,72" fill="#153612"/>
+                        <polygon points="45,43 40,33 50,40" fill="#153612"/>
+                        <polygon points="75,35 80,25 85,33" fill="#153612"/>
+                        <polygon points="60,70 65,60 70,68" fill="#153612"/>
+
+                        <!-- Lá xanh (Leaves) -->
+                        <path d="M 90 90 Q 80 110 105 115 Q 115 95 90 90 Z" fill="#3a7033"/>
+                        <path d="M 100 10 Q 85 15 95 35 Q 115 25 100 10 Z" fill="#3a7033"/>
+                        <path d="M 30 70 Q 50 85 60 60 Q 40 50 30 70 Z" fill="#3a7033"/>
+                        <path d="M 0 50 Q 20 60 30 40 Q 10 30 0 50 Z" fill="#3a7033"/>
+
+                        <!-- Bông hồng to -->
+                        <g transform="translate(35, 45) scale(1.1)">
+                            <path d="M 0 -18 C 18 -22 25 -5 18 8 C 25 20 5 25 -5 18 C -22 22 -28 0 -18 -12 C -28 -22 -12 -28 0 -18 Z" fill="#b3002d"/>
+                            <path d="M 0 -12 C 12 -18 18 -5 12 5 C 18 12 5 18 -5 12 C -18 12 -22 0 -12 -5 C -18 -12 -5 -18 0 -12 Z" fill="#e60039"/>
+                            <path d="M -5 -6 Q 5 -12 12 0 Q 0 12 -5 -6 Z" fill="#ff3366"/>
+                            <path d="M 0 -3 Q 5 0 2 5 Q -2 2 0 -3 Z" fill="#ffb3c1"/>
+                        </g>
+
+                        <!-- Bông hồng nhỏ -->
+                        <g transform="translate(75, 20) scale(0.7) rotate(45)">
+                            <path d="M 0 -18 C 18 -22 25 -5 18 8 C 25 20 5 25 -5 18 C -22 22 -28 0 -18 -12 C -28 -22 -12 -28 0 -18 Z" fill="#b3002d"/>
+                            <path d="M 0 -12 C 12 -18 18 -5 12 5 C 18 12 5 18 -5 12 C -18 12 -22 0 -12 -5 C -18 -12 -5 -18 0 -12 Z" fill="#e60039"/>
+                            <path d="M -5 -6 Q 5 -12 12 0 Q 0 12 -5 -6 Z" fill="#ff3366"/>
+                        </g>
+                        
+                        <!-- Ngôi sao phép thuật -->
+                        <path d="M 100 60 Q 105 70 115 75 Q 105 80 100 90 Q 95 80 85 75 Q 95 70 100 60 Z" fill="#ffd700" opacity="0.8"/>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Dây gai và Hoa hồng góc dưới bên phải -->
+            <div class="decor-corner decor-bottom-right">
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <!-- Dây leo chính -->
+                        <path d="M -10 90 Q 30 70 80 30 Q 110 0 130 -20" stroke="#2d5a27" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <!-- Nhánh leo -->
+                        <path d="M 20 40 Q 60 45 100 10" stroke="#2d5a27" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <path d="M 50 80 Q 70 60 90 90" stroke="#2d5a27" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+                        <!-- Các gai nhọn (Thorns) -->
+                        <polygon points="10,75 16,65 22,72" fill="#153612"/>
+                        <polygon points="45,43 40,33 50,40" fill="#153612"/>
+                        <polygon points="75,35 80,25 85,33" fill="#153612"/>
+                        <polygon points="60,70 65,60 70,68" fill="#153612"/>
+
+                        <!-- Lá xanh (Leaves) -->
+                        <path d="M 90 90 Q 80 110 105 115 Q 115 95 90 90 Z" fill="#3a7033"/>
+                        <path d="M 100 10 Q 85 15 95 35 Q 115 25 100 10 Z" fill="#3a7033"/>
+                        <path d="M 30 70 Q 50 85 60 60 Q 40 50 30 70 Z" fill="#3a7033"/>
+                        <path d="M 0 50 Q 20 60 30 40 Q 10 30 0 50 Z" fill="#3a7033"/>
+
+                        <!-- Bông hồng to -->
+                        <g transform="translate(35, 45) scale(1.1)">
+                            <path d="M 0 -18 C 18 -22 25 -5 18 8 C 25 20 5 25 -5 18 C -22 22 -28 0 -18 -12 C -28 -22 -12 -28 0 -18 Z" fill="#b3002d"/>
+                            <path d="M 0 -12 C 12 -18 18 -5 12 5 C 18 12 5 18 -5 12 C -18 12 -22 0 -12 -5 C -18 -12 -5 -18 0 -12 Z" fill="#e60039"/>
+                            <path d="M -5 -6 Q 5 -12 12 0 Q 0 12 -5 -6 Z" fill="#ff3366"/>
+                            <path d="M 0 -3 Q 5 0 2 5 Q -2 2 0 -3 Z" fill="#ffb3c1"/>
+                        </g>
+
+                        <!-- Bông hồng nhỏ -->
+                        <g transform="translate(75, 20) scale(0.7) rotate(45)">
+                            <path d="M 0 -18 C 18 -22 25 -5 18 8 C 25 20 5 25 -5 18 C -22 22 -28 0 -18 -12 C -28 -22 -12 -28 0 -18 Z" fill="#b3002d"/>
+                            <path d="M 0 -12 C 12 -18 18 -5 12 5 C 18 12 5 18 -5 12 C -18 12 -22 0 -12 -5 C -18 -12 -5 -18 0 -12 Z" fill="#e60039"/>
+                            <path d="M -5 -6 Q 5 -12 12 0 Q 0 12 -5 -6 Z" fill="#ff3366"/>
+                        </g>
+                        
+                        <!-- Ngôi sao phép thuật -->
+                        <path d="M 100 60 Q 105 70 115 75 Q 105 80 100 90 Q 95 80 85 75 Q 95 70 100 60 Z" fill="#ffd700" opacity="0.8"/>
+                    </g>
+                </svg>
+            </div>
+
+            <div class="typed-text-container">
+                <span id="typedText"></span><span class="cursor" id="cursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
+        const uiLayer = document.getElementById('ui');
+        
+        const sceneContainer = document.getElementById('scene-container');
+        const runnerBear = document.getElementById('runner-bear');
+        const bearHolding = document.getElementById('bear-holding');
+        const bearThrown = document.getElementById('bear-thrown');
+        const cardWrapper = document.getElementById('card-wrapper');
+        const miniEnvelope = document.getElementById('mini-envelope'); 
+        
+        const typedText = document.getElementById('typedText');
+        const cursor = document.getElementById('cursor');
+
+        let width, height;
+        let particles = [];
+        let bokehParticles = [];
+        let animationStarted = false;
+        
+        const MAX_PARTICLES = 250; 
+        const BOKEH_COUNT = 100; 
+        
+        const flowerEmojis = ['✨', '🌟', '💫', '🎀', '🌹', '🦋', '🎹', '🪄', '🦋', '🐝','🧸'];
+
+        class Bokeh {
+            constructor() {
+                this.init();
+            }
+            init() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 200 + 40; 
+                this.color = this.getRandomColor();
+                this.opacity = Math.random() * 0.25 + 0.05; 
+                this.vx = (Math.random() - 0.5) * 0.3; 
+                this.vy = (Math.random() - 0.5) * 0.3;
+            }
+            getRandomColor() {
+                const colors = [
+                    'rgba(255, 51, 102,', 
+                    'rgba(255, 0, 64,',    
+                    'rgba(255, 179, 193,', 
+                    'rgba(179, 0, 45,'     
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < -this.size) this.x = width + this.size;
+                if (this.x > width + this.size) this.x = -this.size;
+                if (this.y < -this.size) this.y = height + this.size;
+                if (this.y > height + this.size) this.y = -this.size;
+            }
+            draw() {
+                const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                grad.addColorStop(0, this.color + this.opacity + ')');
+                grad.addColorStop(0.5, this.color + (this.opacity * 0.5) + ')');
+                grad.addColorStop(1, this.color + '0)');
+                
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class Particle {
+            constructor() {
+                this.init(true);
+                this.active = false;
+            }
+            init(isBurst = false) {
+                if (isBurst) {
+                    this.x = width / 2;
+                    this.y = height / 2;
+                    const angle = Math.random() * Math.PI * 2;
+                    const force = Math.random() * 12 + 4;
+                    this.vx = Math.cos(angle) * force;
+                    this.vy = Math.sin(angle) * force;
+                } else {
+                    this.x = Math.random() * width;
+                    this.y = -50;
+                    this.vx = (Math.random() - 0.5) * 2;
+                    this.vy = Math.random() * 2 + 0.5;
+                }
+                this.size = Math.random() * 25 + 15;
+                this.emoji = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.05; 
+                this.swayAngle = Math.random() * Math.PI * 2;
+                this.swaySpeed = Math.random() * 0.03 + 0.01;
+                this.active = true;
+            }
+            update() {
+                if (!this.active) return;
+                
+                this.x += this.vx + Math.sin(this.swayAngle) * 1.5;
+                this.y += this.vy;
+                
+                this.swayAngle += this.swaySpeed;
+                this.rotation += this.rotationSpeed;
+                
+                this.vy += 0.02; 
+                if (this.vy > 3.5) this.vy = 3.5; 
+                
+                this.vx *= 0.99; 
+                
+                if (this.y > height + 50) {
+                    if (animationStarted) this.init(false);
+                    else this.active = false;
+                }
+            }
+            draw() {
+                if (!this.active) return;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.font = `${this.size}px serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                ctx.fillStyle = 'white';
+                ctx.globalAlpha = 1;
+
+                ctx.fillText(this.emoji, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        function initBokeh() {
+            bokehParticles = [];
+            for (let i = 0; i < BOKEH_COUNT; i++) {
+                bokehParticles.push(new Bokeh());
+            }
+        }
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initBokeh(); 
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        for (let i = 0; i < MAX_PARTICLES; i++) {
+            particles.push(new Particle());
+        }
+
+        function launchBurst(count) {
+            let triggered = 0;
+            for (let p of particles) {
+                if (!p.active && triggered < count) {
+                    p.init(true);
+                    triggered++;
+                }
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(26, 0, 8, 0.2)';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.globalCompositeOperation = 'screen';
+            for (let b of bokehParticles) {
+                b.update();
+                b.draw();
+            }
+            ctx.globalCompositeOperation = 'source-over';
+
+            for (let p of particles) {
+                p.update();
+                p.draw();
+            }
+            
+            if (animationStarted) {
+                if (Math.random() > 0.4) {
+                    for (let i = 0; i < MAX_PARTICLES; i++) {
+                        if (!particles[i].active) {
+                            particles[i].init(false);
+                            break; 
+                        }
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (animationStarted) return;
+            animationStarted = true;
+            
+            uiLayer.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+            uiLayer.style.opacity = '0';
+            uiLayer.style.transform = 'scale(1.5)';
+            
+            setTimeout(() => {
+                uiLayer.classList.add('hidden');
+                
+                sceneContainer.classList.remove('hidden');
+                
+                void runnerBear.offsetWidth;
+                
+                // 1. Gấu Moonwalk từ trái ra giữa
+                runnerBear.classList.add('moonwalking');
+                runnerBear.style.transition = 'transform 3s linear'; 
+                runnerBear.style.transform = `translate3d(calc(50vw - 100px), -50%, 0)`;
+                
+                setTimeout(() => {
+                    // 2. Dừng Moonwalk, gấu xoay người đối mặt
+                    runnerBear.classList.remove('moonwalking');
+                    
+                    // Ẩn lá thư cầm ở tay, giơ hai tay lên
+                    miniEnvelope.style.display = 'none';
+                    bearHolding.style.display = 'none';
+                    bearThrown.style.display = 'block';
+                    
+                    // Phóng tấm thiệp vào màn hình
+                    cardWrapper.classList.add('card-thrown');
+                    
+                    setTimeout(() => {
+                         // 3. Giữ nguyên tay giơ lên, xoay lưng lại và tiếp tục Moonwalk đi xa
+                         // Đã bỏ thao tác hạ tay xuống ở đoạn này để gấu "giữ trọn tư thế cool ngầu"
+                         
+                         runnerBear.classList.add('moonwalking');
+                         runnerBear.style.transition = 'transform 2.5s linear'; 
+                         runnerBear.style.transform = `translate3d(120vw, -50%, 0)`; 
+                    }, 800); 
+
+                    // 4. Bắt đầu viết lời chúc
+                    setTimeout(startTyping, 1200);
+
+                }, 3000); 
+
+            }, 800);
+
+            launchBurst(150);
+        });
+
+        // Lời chúc như một câu chuyện cổ tích mầu nhiệm
+        const message = "✨Dear Như Quỳnh!\n\nChào cậu, tớ là Teddy, chỉ là tớ vô tình ghé ngang qua đây, xin phép được gửi tới cậu lời chào và tặng cậu bông hoa 🌹 và chúc cậu buổi sáng vui vẻ 🧸";
+        let textIndex = 0;
+
+        function startTyping() {
+            if (textIndex < message.length) {
+                let char = message.charAt(textIndex);
+                if (char === '\n') {
+                    typedText.innerHTML += '<br>';
+                } else {
+                    typedText.innerHTML += char;
+                }
+                textIndex++;
+                
+                let typingSpeed = Math.random() * 50 + 40; 
+                if (char === ',' || char === '.' || char === '\n' || char === '✨') typingSpeed += 400; 
+                
+                setTimeout(startTyping, typingSpeed);
+            } else {
+                setTimeout(() => {
+                    cursor.style.animation = 'none';
+                    cursor.style.opacity = '0';
+                    cursor.style.transition = 'opacity 1s ease';
+                }, 2000);
+            }
+        }
+
+        animate();
+    </script>
+</body>
+</html>
